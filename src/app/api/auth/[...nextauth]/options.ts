@@ -44,6 +44,29 @@ export const authOptions: NextAuthOptions = {
     pages: {
         signIn: "/sign-in"  // we have given the control of sign-in route to the Next-Auth, so next-auth will handle all the thing for us 
     },
+    callbacks: {
+        async jwt({ token, user }) {
+            // we are creating the token more powerful so in this case we can collect out the user info and store it into token 
+            if(user){
+                token._id = user._id?.toString();
+                token.isVerified = user.isVerified;
+                token.isAcceptingMessages = user.isAcceptingMessages;
+                token.username = user.username;
+            }
+
+            return token
+        },
+        async session({ session, token}) {
+                if(token){
+                    session.user._id = token._id?.toString();
+                    session.user.isVerified = token?.isVerified;
+                    session.user.isAcceptingMessages = token?.isAcceptingMessages;
+                    session.user.username = token?.username;
+                }
+
+            return session
+        }
+    },
     session: {
         strategy: "jwt"
     }, 
